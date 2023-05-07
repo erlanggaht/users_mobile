@@ -1,15 +1,13 @@
 "use client";
 import axios from "axios";
 import Link from "next/link";
+import {useRouter} from 'next/navigation'
 import { useState } from "react";
 
 
-async function SubmitRegister(data){
-    const namas = data.nama
-    const email = data.email
-    const password = data.password
-    const ConfirmPassword = data.ConfirmPassword
-    console.log(ConfirmPassword)
+async function SubmitRegister(data,...params){
+    const [router] = params
+    const {nama,email,password,ConfirmPassword} = data
     try {
         const response = await axios(process.env.URL_HOST+"/register",{
             withCredentials:true,
@@ -18,38 +16,49 @@ async function SubmitRegister(data){
                 "Content-Type" : 'application/json'
             },
             data : {
-                nama : namas,
+                nama : nama,
                 email : email,
                 password : password,
                 confirmPassword : ConfirmPassword
             }
-        })
-        if(response) console.log(response)
+        }) 
+        alert('berhasil daftar')
+        return router.push('/login')
     } catch (error) {
-        console.log({errorCuys : error})
+        alert('ada kesalahan saat daftar.')
     }
     
 
 }
   
 export default function Signup() {
-    const [input, setInput] = useState({ });
+    const [input, setInput] = useState({
+      nama : '',
+      email : '',
+      password : '',
+      ConfirmPassword : ''
+     });
+    const router = useRouter()
+
     function onChange (e) {
       const target = e.target
-      const value = target.value
+      const value = e.currentTarget.value
       const name = target.name
       setInput({
           ...input,
           [name] : value
-      })      
+      })  
     }
 
     function handleSubmit(e) {
         e.preventDefault();
-        
-        SubmitRegister(input)
+        SubmitRegister(input,router)
+
+              //Reset Input after submit
+        setInput({nama : "",email : "",password : "",ConfirmPassword : ""})      
     }
 
+      
   return (
     <>
     <title>Sign up</title>
@@ -73,6 +82,7 @@ export default function Signup() {
                       className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:borer-rose-600"
                       placeholder="Email address" 
                       onChange={onChange}
+                      value={input.nama}
                     />
                     <label
                       htmlFor="name"
@@ -91,6 +101,7 @@ export default function Signup() {
                       className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:borer-rose-600 my-1"
                       placeholder="Email address"
                       onChange={(e) => onChange(e)}
+                      value={input.email}
                     />
                     <label
                       htmlFor="email"
@@ -109,6 +120,8 @@ export default function Signup() {
                       className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:borer-rose-600 "
                       placeholder="Password"
                       onChange={(e) => onChange(e)}
+                      value={input.password}
+
                     />
                     <label
                       htmlFor="password"
@@ -127,6 +140,7 @@ export default function Signup() {
                       className="peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:borer-rose-600 "
                       placeholder="Password"
                       onChange={(e) => onChange(e)}
+                      value={input.ConfirmPassword}
                     />
                     <label
                       htmlFor="ConfirmPassword"
