@@ -7,7 +7,6 @@ import { useState } from "react";
 
 async function SubmitLogin(data,...params){
   const [router] = params
-  console.log(router)
   const {email,password} = data
   try {
       const response = await axios(process.env.URL_HOST+"/login",{

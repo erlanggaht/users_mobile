@@ -8,6 +8,7 @@ export default function Home() {
   const [nama, setNama] = useState([]);
   const [email,setEmail] = useState([]);
   const [exp,setExp] = useState([]); 
+  const [refresh_Token,setRefresh_Token] = useState([])
   const [aksesToken, setAksesToken] = useState([]);
   const [jwtDecoded,setJwtDecoded] = useState([])
 
@@ -24,8 +25,8 @@ export default function Home() {
               setNama(jwtDecoded.nama)
               setEmail(jwtDecoded.email)
               setExp(jwtDecoded.exp)
-                          
-        } catch (error) {
+              setRefresh_Token(response.data.refreshToken);
+            } catch (error) {
           return error
         }
   }
@@ -38,13 +39,16 @@ const fetchCeptor = axios.create();
         const response = await axios(process.env.URL_HOST + "/token", {
           method: "GET",
           withCredentials: true,
+          headers : {
+            Authorization : `Bearer ${refresh_Token}`
+          }
         });
         const decoded = await jwt_decode(response.data.accesstoken);
         config.headers.Authorization = `Bearer ${response.data.accesstoken}`;
         setJwtDecoded(decoded);
         setNama(response.nama);
         setEmail(response.email);
-        setExp(response.exp);      
+        setExp(response.exp); 
       } catch (error) {
         console.log({InterceptorError : error})
       }
@@ -69,8 +73,16 @@ const fetchCeptor = axios.create();
     }
   }
 
-  useEffect(() => {
-    refreshToken() 
+ function setLocalStorege() {
+    localStorage.setItem('refresh_Token',refresh_Token)
+ }
+
+ useEffect(()=>{
+  setLocalStorege()
+ })
+ 
+ useEffect(() => {
+    refreshToken()
     getUsers()
   }, []);
 
